@@ -1,0 +1,7 @@
+.vagrant
+.cache
+venv
+*.pyc
+src/*/output*
+src/*/packer_*
+src/*/http
