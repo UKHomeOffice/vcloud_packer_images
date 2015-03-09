@@ -48,3 +48,6 @@ You'll also need ovftool if it isn't insalled with vmware-workstation / vmware f
 
 _You'll need to do some work if you want to run this on another type of host._
 
+## Would be nice
+- If this feature request ever happens, we'll update the Vagrantfile so this all works within vbox.
+- https://www.virtualbox.org/ticket/4032
