@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+
+require 'methadone'
+require 'time'
+require 'erb'
+
+include Methadone::Main
+include Methadone::CLILogging
+
+main do |func,distro| 
+
+  if func == 'build'
+    Dir.chdir("src/" + distro) do
+      system('rm -rf http && mkdir http')
+      system('rm -rf output-vmware-iso')
+       
+      @password = options[:password]
+      template_string = File.read('template/ks-or-preseed.template')
+      template = ERB.new template_string
+      File.write('http/ks-or-preseed.cfg', template.result)
+
+      command = "packer build -only vmware-iso -var 'ssh_root_password="+options[:password]+"' packer.json"
+      puts command
+      system(command)
+      system('sed -i.bak s/"nat"/"none"/ output-vmware-iso/packer-vmware-iso.vmx')
+    end
+  end
+  if func == 'upload'
+    Dir.chdir("src/" + distro + "/output-vmware-iso") do
+      command = 'ovftool --vCloudTemplate --acceptAllEulas packer-vmware-iso.vmx '+
+		'"vcloud://'+options[:username]+'@api.vcd.portal.skyscapecloud.com:443?org='+options[:org]+
+		'&vappTemplate='+options[:template]+
+		'&catalog='+options[:catalog]+'"'
+      puts command
+      system(command)
+    end
+  end
+end
+
+version     '0.0.1'
+description 'Build and Upload templates'
+arg         :func, :required, "build or upload"
+arg	    :distro, :required
+
+
+on("-p PASSWORD","--password","password") do |pass|
+  options[:password] = pass
+end
+on("-u USERNAME","--username","username") do |username|
+  options[:username] = username
+end
+on("-o ORG","--org","org") do |org|
+  options[:org] = org
+end
+on("-t TEMPLATE","--template","Template Name") do |template|
+  options[:template] = template + Time.now.utc.iso8601
+end
+on("-c CATALOG","--catalog","Catalog") do |catalog|
+  options[:catalog] = catalog
+end
+
+
+go!

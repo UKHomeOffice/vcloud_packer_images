@@ -1,0 +1,126 @@
+{
+  "variables": {
+    "ssh_root_password":null
+  },
+  "builders": [
+    {
+      "boot_command": [
+        "<esc><wait>",
+        "<esc><wait>",
+        "<enter><wait>",
+        "/install/vmlinuz<wait>",
+        " auto<wait>",
+        " console-setup/ask_detect=false<wait>",
+        " console-setup/layoutcode=us<wait>",
+        " console-setup/modelcode=pc105<wait>",
+        " debconf/frontend=noninteractive<wait>",
+        " debian-installer=en_US<wait>",
+        " fb=false<wait>",
+        " initrd=/install/initrd.gz<wait>",
+        " kbd-chooser/method=us<wait>",
+        " keyboard-configuration/layout=USA<wait>",
+        " keyboard-configuration/variant=USA<wait>",
+        " locale=en_US<wait>",
+        " netcfg/get_hostname=ubuntu-1404<wait>",
+        " netcfg/get_domain=vagrantup.com<wait>",
+        " noapic<wait>",
+        " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks-or-preseed.cfg<wait>",
+        " -- <wait>",
+        "<enter><wait>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": 40960,
+      "guest_os_type": "ubuntu-64",
+      "headless": true,
+      "http_directory": "http",
+      "iso_checksum": "01545fa976c8367b4f0d59169ac4866c",
+      "iso_checksum_type": "md5",
+      "iso_url": "http://releases.ubuntu.com/14.04/ubuntu-14.04-server-amd64.iso",
+      "shutdown_command": "shutdown -h now",
+      "ssh_password": "{{user `ssh_root_password`}}",
+      "ssh_port": 22,
+      "ssh_username": "root",
+      "ssh_wait_timeout": "10000s",
+      "type": "vmware-iso",
+      "version": 8,
+      "vmx_data": {
+        "cpuid.coresPerSocket": "1",
+        "memsize": "512",
+        "numvcpus": "1",
+        "ethernet0.allowGuestConnectionControl": "TRUE"
+      }
+    }
+  ],
+  "post-processors": null,
+  "provisioners": [
+    {
+      "execute_command": "sh '{{.Path}}'",
+      "override": {
+        "vmware-iso": {
+          "scripts": [
+            "scripts/base.sh",
+            "scripts/vmware.sh",
+            "scripts/cleanup.sh",
+            "scripts/zerodisk.sh",
+            "scripts/puppet.sh"
+          ]
+        }
+      },
+      "type": "shell"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/blacklist_files.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/init.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/limits.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/login_defs.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/minimize_access.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/pam.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/profile.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/securetty.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/suid_sgid.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/sysctl.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-ssh-hardening/manifests/client.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-ssh-hardening/manifests/init.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-ssh-hardening/manifests/server.pp"
+    }
+
+  ]
+}
+

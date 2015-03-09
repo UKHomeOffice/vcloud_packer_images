@@ -1,0 +1,105 @@
+{
+  "variables":  {
+    "ssh_root_password": null
+  },
+  "builders": [
+    {
+      "boot_command": [
+	"<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks-or-preseed.cfg <enter>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": 40960,
+      "guest_os_type": "centos-64",
+      "headless": true,
+      "http_directory": "http",
+      "iso_checksum": "4ed6c56d365bd3ab12cd88b8a480f4a62e7c66d2",
+      "iso_checksum_type": "sha1",
+      "iso_url": "http://mirror.bytemark.co.uk/centos/6/isos/x86_64/CentOS-6.6-x86_64-minimal.iso",
+      "shutdown_command": "shutdown -h now",
+      "ssh_password": "{{user `ssh_root_password`}}",
+      "ssh_port": 22,
+      "ssh_username": "root",
+      "ssh_wait_timeout": "10000s",
+      "type": "vmware-iso",
+      "version":8,
+      "tools_upload_flavor": "linux",
+      "vmx_data": {
+        "cpuid.coresPerSocket": "1",
+        "memsize": "512",
+        "numvcpus": "1",
+        "ethernet0.allowGuestConnectionControl": "TRUE"
+      }
+    }
+  ],
+  "post-processors": null,
+  "provisioners": [
+    {
+      "execute_command": "sh '{{.Path}}'",
+      "override": {
+        "vmware-iso": {
+          "scripts": [
+            "scripts/base.sh",
+            "scripts/vmware.sh",
+            "scripts/cleanup.sh",
+            "scripts/zerodisk.sh",
+            "scripts/puppet.sh"
+          ]
+        }
+      },
+      "type": "shell"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/blacklist_files.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/init.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/limits.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/login_defs.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/minimize_access.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/pam.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/profile.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/securetty.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/suid_sgid.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-os-hardening/manifests/sysctl.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-ssh-hardening/manifests/client.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-ssh-hardening/manifests/init.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "puppet/puppet-ssh-hardening/manifests/server.pp"
+    }
+  ]
+}
+

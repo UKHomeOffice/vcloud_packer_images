@@ -1,0 +1,29 @@
+---
+AllCops:
+  Exclude:
+  - vendor/**/*
+  - test/**/*
+  - spec/fixtures/**/*
+  - Puppetfile
+Documentation:
+  Enabled: false
+AlignParameters:
+  Enabled: true
+Encoding:
+  Enabled: true
+HashSyntax:
+  Enabled: false
+LineLength:
+  Enabled: false
+EmptyLinesAroundBlockBody:
+  Enabled: false
+MethodLength:
+  Max: 40
+NumericLiterals:
+  MinDigits: 10
+Metrics/CyclomaticComplexity:
+  Max: 10
+Metrics/PerceivedComplexity:
+  Max: 10
+Metrics/AbcSize:
+  Max: 29

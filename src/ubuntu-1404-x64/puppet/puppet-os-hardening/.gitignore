@@ -1,0 +1,10 @@
+exp.*
+.kitchen
+Berksfile.lock
+.kitchen.local.yml
+shared_test_repo/
+test/integration
+.librarian/
+.tmp/
+Puppetfile.lock
+Gemfile.lock
