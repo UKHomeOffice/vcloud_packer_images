@@ -46,4 +46,4 @@ unset HISTFILE
 #Remove the root user’s SSH history & other cruft
 /bin/rm -rf ~root/.ssh/
 /bin/rm -f ~root/anaconda-ks.cfg
-
+rm -f /etc/redhat-release && touch /etc/redhat-release && echo 'Red Hat Enterprise Linux Server release 7.0 (Maipo)' > /etc/redhat-release
