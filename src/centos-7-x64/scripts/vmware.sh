@@ -30,3 +30,4 @@ gpgcheck = 1
 EOF
 
 yum install -y open-vm-tools-deploypkg
+systemctl restart vmtoolsd
