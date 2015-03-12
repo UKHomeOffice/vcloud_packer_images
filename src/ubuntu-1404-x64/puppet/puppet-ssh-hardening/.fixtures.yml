@@ -1,6 +1,0 @@
-fixtures:
-  repositories:
-    ssh: 
-      repo: https://github.com/saz/puppet-ssh.git
-      ref: v2.3.6
-    stdlib: https://github.com/puppetlabs/puppetlabs-stdlib.git
