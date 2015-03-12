@@ -4,7 +4,7 @@ Helps you generates an image from an iso ( currently tested using ubuntu 14.04 b
 ## Intended use
 ### General form 
 Build a new template:
-```./createimage [-p,-u,-o,-t] [build|upload] <template name>
+```./createimage [-p,-u,-o,-t] [build|upload] <template name>```
 
 The createimage script will upload the template to Skyscape or a vCenter compatible provider.
 
@@ -30,12 +30,20 @@ cd vcloud_packer_images
 ./createimage -u 123.456.789 -o 1234-456-223a -t centos -c CentOS  upload centos-66-x64
 ```
 
+### Skyscape translation
+To get API details for skyscape you need to login to the (portal)[https://portal.skyscapecloud.com] and click on your username and then (API)[https://portal.skyscapecloud.com/user/api] . 
+This will give you the API details requried to run the createimage tool. **Note** however that the username as specified by Skyscape is actually your username and the organisation 
+seperated by an **@** symbol.
+
 ## TODO
 
 - Add to the build command so it runs a fix on any json configs before proceeding.
 - Figure out how to run this without infecting host system. (If you have vagrant running with something else other than virtualbox, you _should_ be able to vagrant up) 
 - Double check ruby dependancies are correct.
 - Integrate with local or remote vagrant store to upload vagrant images
+- Move puppet scripts to a share directory used by all images
+- Make the packer build files an ERB template
+- Add PACKER_CACHE_DIR env variable to keep centralised iso cache, if not already.
 
 ## Requirements
 

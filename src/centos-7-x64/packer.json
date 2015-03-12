@@ -21,9 +21,9 @@
       "ssh_username": "root",
       "ssh_wait_timeout": "10000s",
       "type": "vmware-iso",
-      "version":8,
       "tools_upload_flavor": "linux",
       "vmx_data": {
+        "virtualHW.version": "8",
         "cpuid.coresPerSocket": "1",
         "memsize": "512",
         "numvcpus": "1",

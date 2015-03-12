@@ -4,6 +4,10 @@
 1. The createimage script will parse the *ks-or-preseed.template* file in the *templates* directory. It will treat the file as an **ERB** template. 
 1. The createimage script will then save this file which is the file that packer will use to build against. This allows customizations like a custom root password.
 
+## VMX Image creation
+For autoprovisioning to work it requires the *network name* to be changed. When packer builds the vmx file it calls the network **nat** but it should be renamed to
+**none** otherwise you will get an error saying **nat** network not found.
+
 
 ## RHEL7 VMWare tools installation
 The documentation for VMWare tools can be found at: [http://partnerweb.vmware.com/GOSIG/home.html] where you can select the specific OS for detailed instructions.
