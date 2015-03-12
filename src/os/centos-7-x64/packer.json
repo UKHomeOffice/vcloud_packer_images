@@ -12,9 +12,9 @@
       "guest_os_type": "centos-64",
       "headless": true,
       "http_directory": "http",
-      "iso_checksum": "4ed6c56d365bd3ab12cd88b8a480f4a62e7c66d2",
+      "iso_checksum": "495a7d50eb7633c4667fbfc5e817bf244697c627",
       "iso_checksum_type": "sha1",
-      "iso_url": "http://mirror.bytemark.co.uk/centos/6/isos/x86_64/CentOS-6.6-x86_64-minimal.iso",
+      "iso_url": "http://mirrors.ukfast.co.uk/sites/ftp.centos.org/7/isos/x86_64/CentOS-7.0-1406-x86_64-Minimal.iso",
       "shutdown_command": "shutdown -h now",
       "ssh_password": "{{user `ssh_root_password`}}",
       "ssh_port": 22,
@@ -50,55 +50,55 @@
     },
     {
       "type":"puppet-masterless",
-      "manifest_file": "../puppet/puppet-os-hardening/manifests/blacklist_files.pp"
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/blacklist_files.pp"
     },
     {
       "type":"puppet-masterless",
-      "manifest_file": "../puppet/puppet-os-hardening/manifests/init.pp"
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/init.pp"
     },
     {
       "type":"puppet-masterless",
-      "manifest_file": "../puppet/puppet-os-hardening/manifests/limits.pp"
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/limits.pp"
     },
     {
       "type":"puppet-masterless",
-      "manifest_file": "../puppet/puppet-os-hardening/manifests/login_defs.pp"
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/login_defs.pp"
     },
     {
       "type":"puppet-masterless",
-      "manifest_file": "../puppet/puppet-os-hardening/manifests/minimize_access.pp"
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/minimize_access.pp"
     },
     {
       "type":"puppet-masterless",
-      "manifest_file": "../puppet/puppet-os-hardening/manifests/pam.pp"
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/pam.pp"
     },
     {
       "type":"puppet-masterless",
-      "manifest_file": "../puppet/puppet-os-hardening/manifests/profile.pp"
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/profile.pp"
     },
     {
       "type":"puppet-masterless",
-      "manifest_file": "../puppet/puppet-os-hardening/manifests/securetty.pp"
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/securetty.pp"
     },
     {
       "type":"puppet-masterless",
-      "manifest_file": "../puppet/puppet-os-hardening/manifests/suid_sgid.pp"
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/suid_sgid.pp"
     },
     {
       "type":"puppet-masterless",
-      "manifest_file": "../puppet/puppet-os-hardening/manifests/sysctl.pp"
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/sysctl.pp"
     },
     {
       "type":"puppet-masterless",
-      "manifest_file": "../puppet/puppet-ssh-hardening/manifests/client.pp"
+      "manifest_file": "../../puppet/puppet-ssh-hardening/manifests/client.pp"
     },
     {
       "type":"puppet-masterless",
-      "manifest_file": "../puppet/puppet-ssh-hardening/manifests/init.pp"
+      "manifest_file": "../../puppet/puppet-ssh-hardening/manifests/init.pp"
     },
     {
       "type":"puppet-masterless",
-      "manifest_file": "../puppet/puppet-ssh-hardening/manifests/server.pp"
+      "manifest_file": "../../puppet/puppet-ssh-hardening/manifests/server.pp"
     }
   ]
 }

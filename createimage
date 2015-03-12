@@ -10,7 +10,7 @@ include Methadone::CLILogging
 main do |func,distro| 
 
   if func == 'build'
-    Dir.chdir("src/" + distro) do
+    Dir.chdir("src/os/" + distro) do
       system('rm -rf http && mkdir http')
       system('rm -rf output-vmware-iso')
        
@@ -26,7 +26,7 @@ main do |func,distro|
     end
   end
   if func == 'upload'
-    Dir.chdir("src/" + distro + "/output-vmware-iso") do
+    Dir.chdir("src/os/" + distro + "/output-vmware-iso") do
       command = 'ovftool --vCloudTemplate --acceptAllEulas packer-vmware-iso.vmx '+
 		'"vcloud://'+options[:username]+'@api.vcd.portal.skyscapecloud.com:443?org='+options[:org]+
 		'&vappTemplate='+options[:template]+
