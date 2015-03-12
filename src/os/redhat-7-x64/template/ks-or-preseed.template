@@ -1,0 +1,91 @@
+install
+rootpw <%= @password %>
+cdrom
+lang en_GB
+keyboard uk
+network --onboot yes --device link --bootproto dhcp --noipv6
+firewall --enabled --service=ssh
+authconfig --enableshadow --passalgo=sha512
+selinux --enforcing
+firewall --enable --ssh
+timezone --utc Europe/London
+bootloader --location=mbr --driveorder=sda --append="crashkernel=auto rhgb quiet audit=1"
+text
+skipx
+zerombr
+clearpart --all --initlabel
+part /boot --fstype ext4 --size=512 --asprimary
+part pv.01 --size 1 --grow
+volgroup vgroup1 pv.01
+logvol /     --fstype ext4 --name=root --vgname=vgroup1 --size=2560 --grow
+logvol /tmp  --fstype ext4 --name=temp --vgname=vgroup1 --size=1024 --fsoptions="nodev,noexec,nosuid"
+logvol /home --fstype ext4 --name=home --vgname=vgroup1 --size=5120 --fsoptions="nodev"
+logvol /var  --fstype ext4 --name=var  --vgname=vgroup1 --size=3072 --fsoptions="nodev"
+logvol /var/log --fstype ext4 --name=varlog --vgname=vgroup1 --size=5120 --fsoptions="nodev,noexec,nosuid"
+logvol /var/log/audit --fstype ext4 --name=audit --vgname=vgroup1 --size=2048 --fsoptions="nodev,noexec,nosuid"
+logvol swap --fstype swap --name=swap --vgname=vgroup1 --recommended
+auth --useshadow --passalgo=sha512
+firstboot --disabled
+reboot
+%packages --ignoremissing
+@core
+bzip2
+sudo
+kernel-devel
+kernel-headers
+-ipw2100-firmware
+-ipw2200-firmware
+-ivtv-firmware
+%end
+%post
+=======
+
+# Fix up the partitions to be secure
+FSTAB=/etc/fstab
+# nodev, noexec, and nosuid on /boot
+TEST="`grep ' \/boot ' ${FSTAB} | grep -c 'noexec'`"
+if [ "$TEST" = "0" ]; then
+        MNT_OPTS=$(grep " \/boot " ${FSTAB} | awk '{print $4}')
+        sed -i "s/\( \/boot.*${MNT_OPTS}\)/\1,nodev,noexec,nosuid/" ${FSTAB}
+fi
+# nodev, noexec, and nosuid on /dev/shm
+TEST="`grep ' \/dev\/shm ' ${FSTAB} | grep -c 'noexec'`"
+if [ "$TEST" = "0" ]; then
+        MNT_OPTS=$(grep " \/dev\/shm " ${FSTAB} | awk '{print $4}')
+        sed -i "s/\( \/dev\/shm.*${MNT_OPTS}\)/\1,nodev,noexec,nosuid/" ${FSTAB}
+fi
+# Make /var/tmp use /tmp
+grep " \/var\/tmp " ${FSTAB} >/dev/null
+if [ $? -eq 1 ]; then
+        echo -e "/tmp\t\t/var/tmp\t\t\text3\tdefaults,bind,nodev,noexec,nosuid\t0 0" >> ${FSTAB}
+fi
+
+
+# Don't use modprobe.conf, put changes in 1 place
+touch /etc/modprobe.d/usgcb-blacklist
+
+# Disable mounting of cramfs
+echo -e "install cramfs /bin/true" >> /etc/modprobe.d/usgcb-blacklist
+# Disable mounting of freevxfs
+echo -e "install freevxfs /bin/true" >> /etc/modprobe.d/usgcb-blacklist
+# Disable mounting of hfs
+echo -e "install hfs /bin/true" >> /etc/modprobe.d/usgcb-blacklist
+# Disable mounting of hfsplus
+echo -e "install hfsplus /bin/true" >> /etc/modprobe.d/usgcb-blacklist
+# Disable mounting of jffs2
+echo -e "install jffs2 /bin/true" >> /etc/modprobe.d/usgcb-blacklist
+# Disable mounting of squashfs
+echo -e "install squashfs /bin/true" >> /etc/modprobe.d/usgcb-blacklist
+# Disable mounting of udf
+echo -e "install udf /bin/true" >> /etc/modprobe.d/usgcb-blacklist
+
+cat <<EOF > /etc/yum.repos.d/rhel7.repo
+[rhel-7-server-rpms]
+name=Red Hat Enterprise Linux 7 Server (RPMs)
+baseurl=http://1.1.1.1/\$basearch/rhel-7-server-rpms
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
+enabled=1
+gpgcheck=1
+EOF
+
+%end

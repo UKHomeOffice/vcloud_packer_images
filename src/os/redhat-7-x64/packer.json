@@ -1,0 +1,51 @@
+{
+  "variables":  {
+    "ssh_root_password": null
+  },
+  "builders": [
+    {
+      "boot_command": [
+	"<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks-or-preseed.cfg <enter>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": 40960,
+      "guest_os_type": "centos-64",
+      "headless": true,
+      "http_directory": "http",
+      "iso_checksum": "85a9fedc2bf0fc825cc7817056aa00b3ea87d7e111e0cf8de77d3ba643f8646c",
+      "iso_checksum_type": "sha256",
+      "iso_url": "/Users/someuser/Downloads/rhel-server-7.0-x86_64-dvd.iso",
+      "shutdown_command": "shutdown -h now",
+      "ssh_password": "{{user `ssh_root_password`}}",
+      "ssh_port": 22,
+      "ssh_username": "root",
+      "ssh_wait_timeout": "10000s",
+      "type": "vmware-iso",
+      "tools_upload_flavor": "linux",
+      "vmx_data": {
+        "cpuid.coresPerSocket": "1",
+        "memsize": "512",
+        "numvcpus": "1",
+        "virtualHW.version": "8"
+      }
+    }
+  ],
+  "post-processors": null,
+  "provisioners": [
+    {
+      "execute_command": "sh '{{.Path}}'",
+      "override": {
+        "vmware-iso": {
+          "scripts": [
+            "scripts/base.sh",
+            "scripts/vmware.sh",
+            "scripts/cleanup.sh",
+            "scripts/zerodisk.sh"
+          ]
+        }
+      },
+      "type": "shell"
+    }
+  ]
+}
+
