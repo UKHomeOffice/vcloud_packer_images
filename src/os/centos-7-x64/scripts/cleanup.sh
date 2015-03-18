@@ -37,7 +37,10 @@ rm -rf /tmp/*
 rm -f /etc/sysconfig/network-scripts/ifcfg-*
 
 #Remove the SSH host keys
-/bin/rm –f /etc/ssh/*key*
+/bin/rm -f /etc/ssh/*key*
+
+#Remove the machine-id 
+test -f /etc/machine-id && > /etc/machine-id
 
 #Remove the root user’s shell history.
 /bin/rm -f ~root/.bash_history
