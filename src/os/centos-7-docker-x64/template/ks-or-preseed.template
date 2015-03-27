@@ -20,7 +20,7 @@ volgroup vgroup1 pv.01
 logvol /     --fstype ext4 --name=root --vgname=vgroup1 --size=6144
 logvol /tmp  --fstype ext4 --name=temp --vgname=vgroup1 --size=1024 --fsoptions="nodev,noexec,nosuid"
 logvol /home --fstype ext4 --name=home --vgname=vgroup1 --size=5120 --fsoptions="nodev"
-logvol /var  --fstype ext4 --name=var  --vgname=vgroup1 --size=28672 --grow --fsoptions="nodev"
+logvol /var  --fstype ext4 --name=var  --vgname=vgroup1 --size=28000 --grow --fsoptions="nodev"
 logvol /var/log --fstype ext4 --name=varlog --vgname=vgroup1 --size=5120 --fsoptions="nodev,noexec,nosuid"
 logvol /var/log/audit --fstype ext4 --name=audit --vgname=vgroup1 --size=2048 --fsoptions="nodev,noexec,nosuid"
 logvol swap --fstype swap --name=swap --vgname=vgroup1 --recommended

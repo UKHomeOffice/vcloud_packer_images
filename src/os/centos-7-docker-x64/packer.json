@@ -8,7 +8,7 @@
 	"<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks-or-preseed.cfg <enter>"
       ],
       "boot_wait": "10s",
-      "disk_size": 40960,
+      "disk_size": 51200,
       "guest_os_type": "centos-64",
       "headless": true,
       "http_directory": "http",
