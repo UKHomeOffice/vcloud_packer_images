@@ -2,7 +2,7 @@
 .cache
 venv
 *.pyc
-src/*/output*
-src/*/packer_*
-src/*/puppet
-src/*/http
+src/os/*/output*
+src/os/*/packer_*
+src/os/*/puppet
+src/os/*/http
