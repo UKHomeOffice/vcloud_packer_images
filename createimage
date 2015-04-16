@@ -18,8 +18,9 @@ main do |func,distro|
       template_string = File.read('template/ks-or-preseed.template')
       template = ERB.new template_string
       File.write('http/ks-or-preseed.cfg', template.result)
+      vmware_only = ' -only vmware-iso ' unless options[:build_all]
 
-      command = "packer build -only vmware-iso -var 'ssh_root_password="+options[:password]+"' packer.json"
+      command = "packer build #{vmware_only} -var 'ssh_root_password=#{options[:password]}' packer.json"
       puts command
       system(command)
       system('sed -i.bak s/"nat"/"none"/ output-vmware-iso/packer-vmware-iso.vmx')
@@ -58,6 +59,8 @@ end
 on("-c CATALOG","--catalog","Catalog") do |catalog|
   options[:catalog] = catalog
 end
-
+on("-a", "--all") do
+  options[:build_all] = true
+end
 
 go!

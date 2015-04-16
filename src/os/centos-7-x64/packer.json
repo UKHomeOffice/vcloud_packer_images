@@ -1,26 +1,29 @@
 {
   "variables":  {
-    "ssh_root_password": null
+    "ssh_root_password": null,
+    "iso_url": "http://mirrors.ukfast.co.uk/sites/ftp.centos.org/7/isos/x86_64/CentOS-7-x86_64-Minimal-1503-01.iso",
+    "iso_sha1": "7c1e34e95c991175290d704dbdcc6531774cbecb",
+    "shutdown_command": "shutdown -h now"
   },
   "builders": [
     {
+      "type": "vmware-iso",
       "boot_command": [
-	"<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks-or-preseed.cfg <enter>"
+        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks-or-preseed.cfg <enter>"
       ],
       "boot_wait": "10s",
       "disk_size": 40960,
       "guest_os_type": "centos-64",
       "headless": true,
       "http_directory": "http",
-      "iso_checksum": "495a7d50eb7633c4667fbfc5e817bf244697c627",
+      "iso_checksum": "{{ user `iso_sha1`}}",
       "iso_checksum_type": "sha1",
-      "iso_url": "http://mirrors.ukfast.co.uk/sites/ftp.centos.org/7/isos/x86_64/CentOS-7.0-1406-x86_64-Minimal.iso",
+      "iso_url": "{{user `iso_url`}}",
       "shutdown_command": "shutdown -h now",
       "ssh_password": "{{user `ssh_root_password`}}",
       "ssh_port": 22,
       "ssh_username": "root",
       "ssh_wait_timeout": "10000s",
-      "type": "vmware-iso",
       "tools_upload_flavor": "linux",
       "vmx_data": {
         "virtualHW.version": "8",
@@ -29,24 +32,53 @@
         "numvcpus": "1",
         "ethernet0.allowGuestConnectionControl": "TRUE"
       }
+    },
+    {
+      "type": "virtualbox-iso",
+      "boot_command": [
+        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks-or-preseed.cfg <enter>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": 40960,
+      "guest_os_type": "RedHat_64",
+      "headless": true,
+      "http_directory": "http",
+      "iso_checksum": "{{ user `iso_sha1`}}",
+      "iso_checksum_type": "sha1",
+      "iso_url": "{{user `iso_url`}}",
+      "shutdown_command": "{{user `shutdown_command`}}",
+      "ssh_password": "{{user `ssh_root_password`}}",
+      "ssh_port": 22,
+      "ssh_username": "root",
+      "ssh_wait_timeout": "10000s"
     }
   ],
-  "post-processors": null,
+  "post-processors": [
+    {
+      "type": "vagrant",
+      "keep_input_artifact": true
+    }
+  ],
   "provisioners": [
     {
+      "type": "shell",
       "execute_command": "sh '{{.Path}}'",
-      "override": {
-        "vmware-iso": {
-          "scripts": [
-            "scripts/base.sh",
-            "scripts/vmware.sh",
-            "scripts/cleanup.sh",
-            "scripts/zerodisk.sh",
-            "scripts/puppet.sh"
-          ]
-        }
-      },
-      "type": "shell"
+      "script": "scripts/base.sh"
+    },
+    {
+      "type": "shell",
+      "only": ["vmware-iso"],
+      "execute_command": "sh '{{.Path}}'",
+      "scripts": ["scripts/vmware.sh"]
+    },
+    {
+      "type": "shell",
+      "execute_command": "sh '{{.Path}}'",
+      "scripts": [
+        "scripts/cleanup.sh",
+        "scripts/zerodisk.sh",
+        "scripts/puppet.sh"
+      ]
     },
     {
       "type":"puppet-masterless",
