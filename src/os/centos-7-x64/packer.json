@@ -56,7 +56,8 @@
   "post-processors": [
     {
       "type": "vagrant",
-      "keep_input_artifact": true
+      "keep_input_artifact": true,
+      "only": ["virtualbox-iso"]
     }
   ],
   "provisioners": [
@@ -79,6 +80,12 @@
         "scripts/zerodisk.sh",
         "scripts/puppet.sh"
       ]
+    },
+    {
+      "type": "shell",
+      "only": ["virtualbox-iso"],
+      "execute_command": "sh '{{.Path}}'",
+      "scripts": ["scripts/vbox.sh"]
     },
     {
       "type":"puppet-masterless",
