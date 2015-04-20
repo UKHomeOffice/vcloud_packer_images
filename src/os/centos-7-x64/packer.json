@@ -85,7 +85,7 @@
       "type": "shell",
       "only": ["virtualbox-iso"],
       "execute_command": "sh '{{.Path}}'",
-      "scripts": ["scripts/vbox.sh"]
+      "scripts": ["scripts/vagrant.sh"]
     },
     {
       "type":"puppet-masterless",
