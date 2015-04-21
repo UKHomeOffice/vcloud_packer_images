@@ -7,30 +7,36 @@ require 'erb'
 include Methadone::Main
 include Methadone::CLILogging
 
-main do |func,distro| 
+main do |func,distro|
 
   if func == 'build'
     Dir.chdir("src/os/" + distro) do
       system('rm -rf http && mkdir http')
       system('rm -rf output-vmware-iso')
-       
+      system('rm -rf output-virtualbox-iso')
+      system('rm -rf packer_virtualbox-iso_virtualbox.box')
+
       @password = options[:password]
       template_string = File.read('template/ks-or-preseed.template')
       template = ERB.new template_string
       File.write('http/ks-or-preseed.cfg', template.result)
+      vmware_only = ' -only vmware-iso ' if options[:vmware_only]
+      vagrant_only = ' -only virtualbox-iso ' if options[:vagrant_only]
 
-      command = "packer build -only vmware-iso -var 'ssh_root_password="+options[:password]+"' packer.json"
+      command = "packer build #{vmware_only} #{vagrant_only} -var 'ssh_root_password=#{options[:password]}' packer.json"
       puts command
       system(command)
-      system('sed -i.bak s/"nat"/"none"/ output-vmware-iso/packer-vmware-iso.vmx')
+      unless options[:vagrant_only]
+        system('sed -i.bak s/"nat"/"none"/ output-vmware-iso/packer-vmware-iso.vmx')
+      end
     end
   end
   if func == 'upload'
     Dir.chdir("src/os/" + distro + "/output-vmware-iso") do
       command = 'ovftool --vCloudTemplate --acceptAllEulas packer-vmware-iso.vmx '+
-		'"vcloud://'+options[:username]+'@api.vcd.portal.skyscapecloud.com:443?org='+options[:org]+
-		'&vappTemplate='+options[:template]+
-		'&catalog='+options[:catalog]+'"'
+                '"vcloud://'+options[:username]+'@api.vcd.portal.skyscapecloud.com:443?org='+options[:org]+
+                '&vappTemplate='+options[:template]+
+                '&catalog='+options[:catalog]+'"'
       puts command
       system(command)
     end
@@ -42,6 +48,7 @@ description 'Build and Upload templates'
 arg         :func, :required, "build or upload"
 arg	    :distro, :required
 
+options[:vmware_only] = true
 
 on("-p PASSWORD","--password","password") do |pass|
   options[:password] = pass
@@ -58,6 +65,12 @@ end
 on("-c CATALOG","--catalog","Catalog") do |catalog|
   options[:catalog] = catalog
 end
-
+on("--vagrant-also", "Also build VirtualBox Vagrant Box") do
+  options[:vmware_only] = false
+end
+on("--vagrant-only", "Build VirtualBox Vagrant Box Only") do
+  options[:vagrant_only] = true
+  options[:vmware_only] = false
+end
 
 go!

@@ -1,8 +1,9 @@
+.idea
 .vagrant
 .cache
 venv
 *.pyc
-src/*/output*
-src/*/packer_*
-src/*/puppet
-src/*/http
+src/**/output*
+src/**/packer_*
+src/**/puppet
+src/**/http
