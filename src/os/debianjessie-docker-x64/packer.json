@@ -1,0 +1,119 @@
+{
+  "variables": {
+    "ssh_root_password":null
+  },
+  "builders": [
+    {
+      "boot_command": [
+	"<esc><wait>",
+	"install <wait>",
+	"preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks-or-preseed.cfg <wait>",
+	"debian-installer=en_US <wait>",
+	"auto <wait>",
+	"locale=en_US <wait>",
+	"kbd-chooser/method=us <wait>",
+	"netcfg/get_hostname=debian <wait>",
+	"netcfg/get_domain=localhost <wait>",
+	"fb=false <wait>",
+	"debconf/frontend=noninteractive <wait>",
+	"console-setup/ask_detect=false <wait>",
+	"console-keymaps-at/keymap=us <wait>",
+	"keyboard-configuration/xkb-keymap=us <wait>",
+	"<enter><wait>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": 51200,
+      "guest_os_type": "debian8-64",
+      "headless": true,
+      "http_directory": "http",
+      "iso_checksum": "82d3ff6d2422af72f5e1a82de88c21ea",
+      "iso_checksum_type": "md5",
+      "iso_url": "http://gemmei.acc.umu.se/cdimage/jessie_di_rc2/amd64/iso-cd/debian-jessie-DI-rc2-amd64-netinst.iso",
+      "shutdown_command": "shutdown -h now",
+      "ssh_password": "{{user `ssh_root_password`}}",
+      "ssh_port": 22,
+      "ssh_username": "root",
+      "ssh_wait_timeout": "10000s",
+      "type": "vmware-iso",
+      "vmx_data": {
+        "virtualHW.version": "8",
+        "cpuid.coresPerSocket": "1",
+        "memsize": "512",
+        "numvcpus": "1",
+        "ethernet0.allowGuestConnectionControl": "TRUE"
+      }
+    }
+  ],
+  "post-processors": null,
+  "provisioners": [
+    {
+      "execute_command": "sh '{{.Path}}'",
+      "override": {
+        "vmware-iso": {
+          "scripts": [
+            "scripts/base.sh",
+            "scripts/vmware.sh",
+            "scripts/cleanup.sh",
+            "scripts/zerodisk.sh",
+            "scripts/puppet.sh"
+          ]
+        }
+      },
+      "type": "shell"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/blacklist_files.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/init.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/limits.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/login_defs.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/minimize_access.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/pam.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/profile.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/securetty.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/suid_sgid.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "../../puppet/puppet-os-hardening/manifests/sysctl.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "../../puppet/puppet-ssh-hardening/manifests/client.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "../../puppet/puppet-ssh-hardening/manifests/init.pp"
+    },
+    {
+      "type":"puppet-masterless",
+      "manifest_file": "../../puppet/puppet-ssh-hardening/manifests/server.pp"
+    }
+
+  ]
+}
+
