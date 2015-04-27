@@ -53,14 +53,12 @@ The following is what you'll need on a fairly recent debian / ubuntu system.
 - aptitude install unzip qemu libxtst6 libxcursor1 libxinerama1 libxi6 wget ruby -y
 - wget -O packer.zip https://dl.bintray.com/mitchellh/packer/packer_0.7.5_linux_amd64.zip && unzip packer.zip && rm packer.zip && cp packer* /usr/local/bin
 - wget -O vmware.bundle https://download3.vmware.com/software/wkst/file/VMware-Workstation-Full-11.0.0-2305329.x86_64.bundle && bash vmware.bundle --required --eulas-agreed --console
-- virtualenv venv && pip install -r requirements.txt
 
 # Mac os X
 - Use brew to install the dependencies above i.e. ruby etc. 
 - Brew's version of packer isn't updated enough and doesn't understand the hardware version for the vmware-iso 
 - wget -O packer.zip https://dl.bintray.com/mitchellh/packer/packer_0.7.5_darwin_amd64.zip && unzip packer.zip && rm packer.zip && sudo cp packer* /usr/local/bin
 - Download VMWARE Fusion for MAC
-- virtualenv venv && pip install -r requirements.txt
 
 You'll also need ovftool if it isn't insalled with vmware-workstation / vmware fusion (MAC).  Currently, this is only available on the vmware website after you signup.
 ovftool can be downloaded from: [VMWare](https://my.vmware.com/web/vmware/details?downloadGroup=OVFTOOL400&productId=353)
