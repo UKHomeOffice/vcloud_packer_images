@@ -57,7 +57,8 @@ main do |func,distro|
       verifyBuild(packerHash, buildType)
 
       command = "packer build #{formatString} -var 'ssh_root_password=#{options[:password]}' packer.json"
-      puts command
+      viscommand = "packer build #{formatString} -var 'ssh_root_password=****HIDDEN****' packer.json"
+      puts viscommand
       system(command)
       unless options[:vagrant_only] 
         system('sed -i.bak s/"nat"/"none"/ output-vmware-iso/packer-vmware-iso.vmx')
@@ -112,21 +113,35 @@ def getFormat(vagrant_only, vmware_only, packerHash)
   else
     formatString = nil
     buildType = nil
-    puts
-    say("<%= color('Which type of box should I build?', :headline)%>")
-      
-    choose do |menu|
-      menu.index    = :letter
-      menu.index_suffix = ") "
-      
-      menu.prompt = "Choose one option:"
-      
-      for type in packerHash['builders']
-        menu.choice(type['type']) do |theOp|
-            formatString = " -only #{theOp} "
-            buildType = theOp
+    
+    builderArr = []
+    i = 0
+    
+    for type in packerHash['builders']
+        builderArr[i] = type['type']
+        i += 1
+    end
+    
+    if i > 1
+        puts
+        say("<%= color('Which type of box should I build?', :headline)%>")
+          
+        choose do |menu|
+          menu.index    = :letter
+          menu.index_suffix = ") "
+          
+          menu.prompt = "Choose one option:"
+          
+          for type in packerHash['builders']
+            menu.choice(type['type']) do |theOp|
+                formatString = " -only #{theOp} "
+                buildType = theOp
             end
-      end
+          end
+        end
+    else
+        formatString = "-only #{type['type']}"
+        buildType = type['type']
     end
   end
   
