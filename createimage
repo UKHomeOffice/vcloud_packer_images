@@ -3,38 +3,70 @@
 require 'methadone'
 require 'time'
 require 'erb'
+require 'highline/import'
+require 'json'
+
+ft = HighLine::ColorScheme.new do |cs|
+        cs[:headline]        = [ :bold, :red, :on_black ]
+        cs[:menu_item]        = [ :green ]
+     end
+
+HighLine.color_scheme = ft
 
 include Methadone::Main
 include Methadone::CLILogging
 
 PACKER_ROOT = File.dirname(__FILE__)
+imagesDir = "#{PACKER_ROOT}/src/os/"
 
 main do |func,distro|
 
+  if distro == nil
+    distro = getDistro(imagesDir)
+  end
+  
+  distroDir = "#{imagesDir}/" + distro
+
   if func == 'build'
-    Dir.chdir("#{PACKER_ROOT}/src/os/" + distro) do
+    
+    Dir.chdir("#{distroDir}") do
       system('rm -rf http && mkdir http')
       system('rm -rf output-vmware-iso')
       system('rm -rf output-virtualbox-iso')
       system('rm -rf packer_virtualbox-iso_virtualbox.box')
 
+      unless options[:password]
+        puts
+        options[:password] = ask("<%= color('Please set a Password: ', :headline)%>") { |q| q.echo = "x" }
+        puts
+      end
       @password = options[:password]
+
       template_string = File.read('template/ks-or-preseed.template')
       template = ERB.new template_string
       File.write('http/ks-or-preseed.cfg', template.result)
-      vmware_only = ' -only vmware-iso ' if options[:vmware_only]
-      vagrant_only = ' -only virtualbox-iso ' if options[:vagrant_only]
 
-      command = "packer build #{vmware_only} #{vagrant_only} -var 'ssh_root_password=#{options[:password]}' packer.json"
-      puts command
+      packerFile = File.read('./packer.json')
+      packerHash = JSON.parse(packerFile)
+      
+      buildType = nil
+      formatResults = getFormat(options[:vagrant_only], options[:vmware_only], packerHash)
+      formatString = formatResults[0]
+      buildType = formatResults[1]
+      
+      verifyBuild(packerHash, buildType)
+
+      command = "packer build #{formatString} -var 'ssh_root_password=#{options[:password]}' packer.json"
+      viscommand = "packer build #{formatString} -var 'ssh_root_password=****HIDDEN****' packer.json"
+      puts viscommand
       system(command)
-      unless options[:vagrant_only]
+      unless options[:vagrant_only] 
         system('sed -i.bak s/"nat"/"none"/ output-vmware-iso/packer-vmware-iso.vmx')
       end
     end
   end
   if func == 'upload'
-    Dir.chdir("#{PACKER_ROOT}/src/os/" + distro + "/output-vmware-iso") do
+    Dir.chdir("#{distroDir}/output-vmware-iso") do
       command = 'ovftool --vCloudTemplate --acceptAllEulas packer-vmware-iso.vmx '+
                 '"vcloud://'+options[:username]+'@api.vcd.portal.skyscapecloud.com:443?org='+options[:org]+
                 '&vappTemplate='+options[:template]+
@@ -48,9 +80,7 @@ end
 version     '0.0.1'
 description 'Build and Upload templates'
 arg         :func, :required, "build or upload"
-arg	    :distro, :required
-
-options[:vmware_only] = true
+arg	    :distro, :optional
 
 on("-p PASSWORD","--password","password") do |pass|
   options[:password] = pass
@@ -73,6 +103,127 @@ end
 on("--vagrant-only", "Build VirtualBox Vagrant Box Only") do
   options[:vagrant_only] = true
   options[:vmware_only] = false
+end
+
+def getFormat(vagrant_only, vmware_only, packerHash)
+  if vagrant_only
+    formatString = ' -only virtualbox-iso '
+  elsif vmware_only
+    formatString = ' -only vmware-iso '
+  else
+    formatString = nil
+    buildType = nil
+    
+    builderArr = []
+    i = 0
+    
+    for type in packerHash['builders']
+        builderArr[i] = type['type']
+        i += 1
+    end
+    
+    if i > 1
+        puts
+        say("<%= color('Which type of box should I build?', :headline)%>")
+          
+        choose do |menu|
+          menu.index    = :letter
+          menu.index_suffix = ") "
+          
+          menu.prompt = "Choose one option:"
+          
+          for type in packerHash['builders']
+            menu.choice(type['type']) do |theOp|
+                formatString = " -only #{theOp} "
+                buildType = theOp
+            end
+          end
+        end
+    else
+        formatString = "-only #{type['type']}"
+        buildType = type['type']
+    end
+  end
+  
+  return formatString, buildType
+end
+
+def getDistro(imagesDir)
+  theDistro = nil
+  
+  Dir.chdir(imagesDir) do
+    output = `ls -l`
+    distros = output.split("\n")
+    distros.shift
+    puts
+    say("<%= color('Which distro would you like to use?', :headline)%>")
+    
+    choose do |menu|
+      menu.index        = :letter
+      menu.index_suffix = ") "
+      
+      menu.prompt = "Choose one option:"
+      
+      for distro in distros;
+        name = distro.split.last
+        menu.choice(name) do |theChoice| theDistro = theChoice end
+      end
+    end
+  end
+  
+  return theDistro
+end
+
+def verifyBuild(packerHash, buildType)
+  
+  for builder in packerHash['builders']
+    unless builder['type'] == buildType
+      next
+    else
+      if builder['headless']
+        puts
+        say("<%= color('Your build is set to use headless mode, continue?', :headline)%>")
+        choose do |menu|
+          menu.index        = :letter
+          menu.index_suffix = ") "
+          
+          menu.prompt = "Choose one option:"
+          
+          menu.choice(:Continue) do say("Continuing with build in headless mode.") end
+          menu.choice(:Quit) do say("<%= color('Cancelling the build, please fix the json build file and re-run createimage.', :headline)%>")
+            abort
+            end
+        end
+      else
+        for builder in packerHash['builders']
+          unless builder['type'] == buildType
+            next
+          else
+            puts
+            say("<%= color('Your build currently looks like this:', :headline)%>")
+            puts
+            for key, value in builder
+              say("<%= color('#{key}: #{value}', :menu_item)%>")
+            end
+            
+            puts
+            say("<%= color('Continue with the build options shown above?', :headline)%>")
+            choose do |menu|
+              menu.index        = :letter
+              menu.index_suffix = ") "
+              
+              menu.prompt = "Choose one option:"
+              
+              menu.choice(:Continue) do say("Continuing with build.") end
+              menu.choice(:Quit) do say("<%= color('Cancelling the build, please fix the json build file and re-run createimage.', :headline)%>")
+                abort
+                end
+            end
+          end 
+        end
+      end
+    end
+  end
 end
 
 go!
