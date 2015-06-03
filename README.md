@@ -8,9 +8,6 @@ Build a new template:
 
 The createimage script will upload the template to Skyscape or a vCenter compatible provider.
 
-** Required Fields for build**
-* -p password 
-
 ** Required Fields for upload**
 * -d distro
 * -u username
@@ -28,6 +25,7 @@ cd vcloud_packer_images
 ./createimage -p p4ssw0rd build centos-66-x64 #_for Centos 66_
 ./createimage -p p4ssw0rd build ubuntu-1404-x64 #_for Ubuntu 14.04_
 ./createimage -u 123.456.789 -o 1234-456-223a -t centos -c CentOS  upload centos-66-x64
+./createimage build #_you will be prompted for options (distro, vm type, password) during the build run
 ```
 
 ### Skyscape translation
