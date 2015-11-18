@@ -1,0 +1,16 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    highline (1.7.8)
+    methadone (1.9.2)
+      bundler
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  highline
+  methadone
+
+BUNDLED WITH
+   1.10.6

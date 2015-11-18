@@ -19,13 +19,21 @@ password for image uploading is not allowed.
 
 
 ### Examples
-```
+
+First install the ruby dependencies with bundler
+
+```shell
 git clone git@github.com:UKHomeOffice/vcloud_packer_images.git
 cd vcloud_packer_images
-./createimage -p p4ssw0rd build centos-66-x64 #_for Centos 66_
-./createimage -p p4ssw0rd build ubuntu-1404-x64 #_for Ubuntu 14.04_
-./createimage -u 123.456.789 -o 1234-456-223a -t centos -c CentOS  upload centos-66-x64
-./createimage build #_you will be prompted for options (distro, vm type, password) during the build run
+bundle install
+```
+
+Then you can run commands
+```
+bundle exec ./createimage -p p4ssw0rd build centos-66-x64 #_for Centos 66_
+bundle exec ./createimage -p p4ssw0rd build ubuntu-1404-x64 #_for Ubuntu 14.04_
+bundle exec ./createimage -u 123.456.789 -o 1234-456-223a -t centos -c CentOS  upload centos-66-x64
+bundle exec ./createimage build #_you will be prompted for options (distro, vm type, password) during the build run
 ```
 
 ### Skyscape translation
@@ -51,12 +59,14 @@ The following is what you'll need on a fairly recent debian / ubuntu system.
 - aptitude install unzip qemu libxtst6 libxcursor1 libxinerama1 libxi6 wget ruby -y
 - wget -O packer.zip https://dl.bintray.com/mitchellh/packer/packer_0.7.5_linux_amd64.zip && unzip packer.zip && rm packer.zip && cp packer* /usr/local/bin
 - wget -O vmware.bundle https://download3.vmware.com/software/wkst/file/VMware-Workstation-Full-11.0.0-2305329.x86_64.bundle && bash vmware.bundle --required --eulas-agreed --console
+- gem install bundler
 
 # Mac os X
 - Use brew to install the dependencies above i.e. ruby etc. 
 - Brew's version of packer isn't updated enough and doesn't understand the hardware version for the vmware-iso 
 - wget -O packer.zip https://dl.bintray.com/mitchellh/packer/packer_0.7.5_darwin_amd64.zip && unzip packer.zip && rm packer.zip && sudo cp packer* /usr/local/bin
 - Download VMWARE Fusion for MAC
+- gem install bundler
 
 You'll also need ovftool if it isn't insalled with vmware-workstation / vmware fusion (MAC).  Currently, this is only available on the vmware website after you signup.
 ovftool can be downloaded from: [VMWare](https://my.vmware.com/web/vmware/details?downloadGroup=OVFTOOL400&productId=353)
